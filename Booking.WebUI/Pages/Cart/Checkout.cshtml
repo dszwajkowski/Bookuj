@@ -1,0 +1,85 @@
+﻿@page
+@model Booking.WebUI.Pages.Cart.CheckoutModel
+@{
+
+}
+<section class="checkout">
+    <form method="post" asp-page-handler="CreateOffer">
+        <h2 class="text-center">Uzupełnij dane</h2>
+        <hr />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-floating">
+            <input asp-for="Input.FirstName" class="form-control" autocomplete="given-name" aria-required="true" placeholder="Jan" />
+            <label asp-for="Input.FirstName"></label>
+            <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+        </div>
+        <div class="form-floating">
+            <input asp-for="Input.SecondName" class="form-control" autocomplete="family-name" aria-required="true" placeholder="Kowalski" />
+            <label asp-for="Input.SecondName" class="form-label"></label>
+            <span asp-validation-for="Input.SecondName" class="text-danger"></span>
+        </div>
+        <div class="form-floating">
+            <input asp-for="Input.AddressLine" class="form-control" autocomplete="street-address" aria-required="true" placeholder="Newelska 6" />
+            <label asp-for="Input.AddressLine" class="form-label"></label>
+            <span asp-validation-for="Input.AddressLine" class="text-danger"></span>
+        </div>
+        <div class="form-floating">
+            <select class="form-select" asp-for="Input.CityID" asp-items="@Model.Cities" autocomplete="address-level2">
+                <option>Wybierz miasto</option>
+            </select>
+            <label asp-for="Input.CityID" class="form-label"></label>
+            <span asp-validation-for="Input.PostalCode" class="text-danger"></span>
+        </div>
+        <div class="form-floating">
+            <input asp-for="Input.PostalCode" class="form-control" autocomplete="postal-code" aria-required="true" placeholder="00-462" />
+            <label asp-for="Input.PostalCode" class="form-label"></label>
+            <span asp-validation-for="Input.PostalCode" class="text-danger"></span>
+        </div>
+        <div class="form-floating">
+            <input asp-for="Input.Email" class="form-control" autocomplete="email" aria-required="true" placeholder="przykladowy@@email.pl" />
+            <label asp-for="Input.Email" class="form-label"></label>
+            <span asp-validation-for="Input.Email" class="text-danger"></span>
+        </div>
+        <div class="form-floating">
+            <input asp-for="Input.PhoneNumber" class="form-control" autocomplete="tel" aria-required="true" placeholder="123456789" />
+            <label asp-for="Input.PhoneNumber" class="form-label"></label>
+            <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+        </div>
+        @*<input type="hidden" asp-for="@Model.Cart?.ID" />*@
+        @Html.HiddenFor(x => x.Cart.ID)
+        @for (int i = 0; i < Model.Cart?.Reservations.Count(); i++)
+        {
+            @*        <input type="hidden" asp-for="@Model.Cart.Reservations[i].ID" />
+                <input type="hidden" asp-for="@Model.Cart.Reservations[@i].Offer?.ID" />
+                <input type="hidden" asp-for="@Model.Cart.Reservations[@i].LodgingOption.ID" />*@
+            @Html.HiddenFor(x => x.Cart.Reservations[@i].ID)
+            @Html.HiddenFor(x => x.Cart.Reservations[@i].Offer.ID)
+            @Html.HiddenFor(x => x.Cart.Reservations[@i].LodgingOption.ID)
+        }
+        <div class="form-floating">
+            <select class="form-select" asp-for="PaymentMethodID" asp-items="@Model.PaymentMethods">
+                <option>Wybierz metodę płatności</option>
+            </select>
+            <label class="form-label">Metoda płatności</label>
+        </div>
+        <button type="submit" class="w-100 btn btn-lg btn-dark mt-3">Złóż zamówienie</button>
+    </form>
+</section>
+@*<form method="post" action="https://secure.snd.payu.com/api/v2_1/orders">
+    <input type="hidden" name="continueUrl" value="http://shop.url/continue">
+    <input type="hidden" name="currencyCode" value="PLN">
+    <input type="hidden" name="customerIp" value="123.123.123.123">
+    <input type="hidden" name="description" value="Order description">
+    <input type="hidden" name="merchantPosId" value="429265">
+    <input type="hidden" name="notifyUrl" value="http://shop.url/notify">
+    <input type="hidden" name="products[0].name" value="Product 1">
+    <input type="hidden" name="products[0].quantity" value="1">
+    <input type="hidden" name="products[0].unitPrice" value="1000">
+    <input type="hidden" name="totalAmount" value="1000">
+    <input type="hidden" name="OpenPayu-Signature" value="sender=145227;algorithm=SHA-256;signature=bc94a8026d6032b5e216be112a5fb7544e66e23e68d44b4283ff495bdb3983a8">
+    <button type="submit" formtarget="_blank">Pay with PayU</button>
+</form>*@
+
+@section Scripts {
+<partial name="_ValidationPartial" />
+}

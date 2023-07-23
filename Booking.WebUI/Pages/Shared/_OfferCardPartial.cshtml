@@ -1,0 +1,81 @@
+﻿@using Booking.Application.Common.Interfaces
+@inject SignInManager<Booking.Domain.Entities.User> SignInManager
+@inject ICurrentUserService CurrentUser
+@model Booking.WebUI.Pages.Shared._OfferCardPartialModel
+<div class="card mb-3">
+    <div class="row g-0">
+        <div class="col-md-4">
+            <img src="@Model.Offer.ThumbnailPath" class="img-fluid rounded-start offer-thumbnail" alt="Zdjęcie oferty">
+        </div>
+        <div class="col-md-8">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="card-title">
+                        <a class="text-dark" asp-page="/Offer/Details"
+                           asp-route-ID="@Model.Offer.ID"
+                           asp-route-DateFrom="@Model.Filters.DateFrom"
+                           asp-route-DateTo="@Model.Filters.DateTo"
+                           asp-route-PersonCount="@Model.Filters.PersonCount"
+                           asp-route-RoomCount="@Model.Filters.RoomCount"
+                           asp-route-PriceMin="@Model.Filters.PriceMin"
+                           asp-route-PriceMax="@Model.Filters.PriceMax"
+                           asp-route-SizeMin="@Model.Filters.SizeMin"
+                           asp-route-SizeMax="@Model.Filters.SizeMax">
+                            @Model.Offer.Title
+                        </a>
+                        @if (Model.Offer.OpinionCount > 0)
+                        {
+                            <i class="fa fa-star fa-sm text-dark">@Math.Round(Model.Offer.Rating, 2, MidpointRounding.AwayFromZero)/5 (@Model.Offer.OpinionCount)</i>
+                        }
+                        @*                        else
+                            {
+                            <small class="text-muted">Ta oferta nie ma jeszcze opini</small>
+                            }*@
+
+                    </h5>
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        <div class="dropdown dropstart float-end">
+                            <a href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-ellipsis-v text-dark"></i>
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                @if (CurrentUser.ID == Model.Offer.AuthorId)
+                                {
+                                    <a class="dropdown-item" asp-page="/Offer/Edit" asp-route-ID="@Model.Offer.ID">Edytuj</a>
+                                }
+                                @if (CurrentUser.ID == Model.Offer.AuthorId || User.IsInRole("Admin"))
+                                {
+                                    <form method="post" asp-route-id="@Model.Offer.ID" asp-page-handler="@Model.DeleteHandler">
+                                        <input type="hidden" asp-for="Filters.City" />
+                                        <input type="hidden" asp-for="Filters.DateFrom" />
+                                        <input type="hidden" asp-for="Filters.DateTo" />
+                                        <input type="hidden" asp-for="Filters.PersonCount" />
+                                        <input type="hidden" asp-for="Filters.RoomCount" />
+                                        <input type="hidden" asp-for="Filters.BedCount" />
+                                        <input type="hidden" asp-for="Filters.PriceMin" />
+                                        <input type="hidden" asp-for="Filters.PriceMax" />
+                                        <input type="hidden" asp-for="Filters.SizeMin" />
+                                        <input type="hidden" asp-for="Filters.SizeMax" />
+                                        <input type="hidden" asp-for="Filters.AuthorID" />
+                                        <button class="btn dropdown-item text-danger" type="submit">Archiwizuj</button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+                <h6>@Model.Offer.CityName, @Model.Offer.AddressLine</h6>
+                @if (Model.Offer.Description is not null && Model.Offer.Description.Length > 370)
+                {
+                    <p class="card-text">@Model.Offer.Description.Substring(0, 370)...</p>
+                }
+                else
+                {
+                    <p class="card-text">@Model.Offer.Description</p>
+                }
+                @*<p class="card-text"><small class="text-muted">Opublikowano: @Model.Offer.DateCreated.Value.ToShortDateString()</small></p>*@
+            </div>
+        </div>
+    </div>
+</div>

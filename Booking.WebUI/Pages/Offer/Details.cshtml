@@ -1,0 +1,236 @@
+﻿@page "{id}"
+
+@using Booking.Application.Dtos
+@using Booking.Application.Common.Interfaces
+@using Booking.WebUI.Pages.Shared
+@inject SignInManager<Booking.Domain.Entities.User> SignInManager
+@inject ICurrentUserService CurrentUser
+
+@model Booking.WebUI.Pages.Offer.DetailsModel
+@{
+    ViewData["Title"] = Model.Offer.Title;
+}
+
+@Html.AntiForgeryToken()
+
+<section class="offerDetails">
+    <partial name="_MessagePartial" for="StatusMessage" />
+    <h3>@Model.Offer.Title</h3>
+    <p>Adres: @Model.Offer.CityName, @Model.Offer.AddressLine, @Model.Offer.PostalCode</p>
+    <div id="offerGallery" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            @{
+                bool active = true;
+                if (Model.Offer.OfferPhotos is not null)
+                {
+                    for (int i = 0; i < Model.Offer.OfferPhotos.Count; i++)
+                    {
+                        <button type="button" data-bs-target="#offerGallery" data-bs-slide-to="@i" class="active" @(active == true ? "aria-current='true'" : "") aria-label="Photo @i"></button>
+                        if (active) active = false;
+                    }
+                    active = true;
+                }
+            }
+        </div>
+        <div class="carousel-inner">
+            @{
+                if (Model.Offer.OfferPhotos is not null)
+                {
+                    foreach (var photo in @Model.Offer.OfferPhotos)
+                    {
+                        <div class="carousel-item @(active == true ? "active" : "")">
+                            <img src="@photo.FullPath" class="d-block w-100" alt="Photo">
+                        </div>
+                        active = false;
+                    }
+                }
+            }
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#offerGallery" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#offerGallery" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+    <div class="row g-3">
+        <div class="col-md-8">
+            <h4>Opis:</h4>
+            <p class="justify">@Model.Offer.Description</p>
+        </div>
+        <div class="col-md-4 align-self-center">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title text-center">Opublikowane przez:</h5>
+                    <div class="text-center">
+                        <img src="@Model.Offer.AvatarPath"
+                             class="rounded-circle"
+                             height="100"
+                             alt="Awatar" />
+                    </div>
+                    <p class="text-center"><a class="link-dark text-center" asp-page="/User/Index" asp-route-username="@Model.Offer.Username">@Model.Offer.Username</a></p>
+                    <p class="text-center"><i class="fa fa-envelope text-dark"></i> @Model.Offer.Email</p>
+                    <p class="text-center"><i class="fa fa-mobile-alt text-dark"></i> @Model.Offer.Phone</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr />
+    <form method="post">
+        <div class="row g-0">
+            <div class="col">
+                <label>Pobyt od:</label>
+                <input type="date" asp-for="Filters.DateFrom" class="form-control" min="@DateTime.Now.Date.ToString("yyyy-MM-dd")">
+            </div>
+            <div class="col">
+                <label>do:</label>
+                <input type="date" asp-for="Filters.DateTo" class="form-control" min="@DateTime.Now.Date.AddDays(1).ToString("yyyy-MM-dd")">
+            </div>
+            <div class="col">
+                <label>Liczba osób:</label>
+                <input asp-for="Filters.PersonCount" type="text" class="form-control" placeholder="Liczba osób">
+            </div>
+            <div class="col">
+                <label>Ilość łóżek:</label>
+                <input asp-for="Filters.BedCount" type="text" class="form-control" placeholder="Ilość łóżek">
+            </div>
+            <div class="col">
+                <label>Ilość pokoi:</label>
+                <input asp-for="Filters.RoomCount" type="text" class="form-control" placeholder="Ilość pokoi">
+            </div>
+        </div>
+        <div class="row g-0">
+            <div class="col">
+                <label>Powierzchnia od:</label>
+                <input asp-for="Filters.PriceMin" type="text" class="form-control" placeholder="Powierzchnia minimalna">
+            </div>
+            <div class="col">
+                <label>Powierzchnia do:</label>
+                <input asp-for="Filters.PriceMax" type="text" class="form-control" placeholder="Powierzchnia maksymalna">
+            </div>
+            <div class="col">
+                <label>Cena od:</label>
+                <input asp-for="Filters.PriceMin" type="text" class="form-control" placeholder="Cena minimalna">
+            </div>
+            <div class="col">
+                <label>Cena do:</label>
+                <input asp-for="Filters.PriceMax" type="text" class="form-control" placeholder="Cena maksymalna">
+            </div>
+            <div class="col">
+                <label></label>
+                <div class="input-group">
+                    <input type="hidden" class="form-control">
+                    <button type="submit" value="Szukaj" class="btn btn-dark form-control">Zastosuj</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div id="LodgingOptions" style="margin-top:10px">
+        @if (Model.LodgingOptions is not null && Model.LodgingOptions.Count > 0)
+        {
+            <div class="table-responive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Maksymalna ilość osób</th>
+                            <th>Ilość łóżek</th>
+                            <th>Ilość pokoi</th>
+                            <th>Powierzchnia</th>
+                            <th>Cena za noc</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var lo in Model.LodgingOptions)
+                        {
+                            <tr>
+                                <td><i class="fa fa-@(lo.PersonCount == 1 ? "user" : "user-friends") text-dark"></i> x @lo.PersonCount</td>
+                                <td><i class="fa fa-bed text-dark"></i> x @lo.BedCount</td>
+                                <td><i class="fa fa-door-open text-dark"></i> x @lo.RoomCount</td>
+                                <td><i class="fa fa-dice-d6 text-dark"></i> @lo.Size</td>
+                                <td><i class="fa fa-money-bill-alt text-dark"></i> @Math.Round(lo.Price, 2, MidpointRounding.AwayFromZero)</td>
+                                <td>
+                                    <a class="addToCart" asp-page="/Offer/Details"
+                               asp-page-handler="AddToCart"
+                               asp-route-lodgingOptionsID="@lo.ID"
+                               asp-route-dateFrom="@Model.Filters.DateFrom"
+                               asp-route-dateTo="@Model.Filters.DateTo">
+                                        <i class="fa fa-cart-plus text-dark"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else if (Model.Filters.DateFrom is null || Model.Filters.DateTo is null)
+        {
+            <p class="text-center mt-5">Podaj termin pobytu aby zobaczyć dostępne opcje noclegowe.</p>
+        }
+        else
+        {
+            <p class="text-center mt-5">Nie znaleziono ofert o podanych parametrach.</p>
+        }
+
+    </div>
+</section>
+<section class="offerOpinions">
+    <h2 class="text-center">Opinie</h2>
+    <hr />
+    <div>
+        @if (Model.OfferOpinions is not null)
+        {
+            foreach (var opinion in Model.OfferOpinions.Data)
+            {
+                <div class="card mb-3">
+                    <div class="row g-0">
+                        <div class="col-md-2 align-self-center text-center mt-3">
+                            <img src="@opinion.AvatarPath"
+                         class="rounded-circle"
+                         height="50"
+                         alt="Awatar" />
+                            <p><a class="link-dark text-center" asp-page="/User/Index" asp-route-username="@opinion.Username">@opinion.Username</a></p>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="card-body">
+                                <div class="d-inline">
+                                    <p class="card-title float-start"><strong>@opinion.Rating/5</strong></p>
+                                    @if (SignInManager.IsSignedIn(User))
+                                    {
+                                        <div class="dropdown float-end">
+                                            <a href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <i class="fa fa-ellipsis-v text-dark"></i>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                @if (CurrentUser.ID == opinion.AuthorID || User.IsInRole("Admin"))
+                                                {
+                                                    <form method="post" asp-page-handler="DeleteOpinion" asp-route-id="@Model.Offer.ID" asp-route-opinionID="@opinion.ID">
+                                                        <button class="btn dropdown-item text-danger" type="submit">Usuń</button>
+                                                    </form>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">@opinion.Text</p>
+                                <p class="card-text"><small class="text-muted">Opublikowano @opinion.DateCreated</small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        <form method="post">
+            <partial name="_PaginatedListPartial" model=@(_PaginatedListPartialModel.Create<OfferOpinionDto>(Model.OfferOpinions, "LoadMoreOpinions", "Ta oferta nie ma jeszcze opinii.")) />
+        </form>
+    </div>
+</section>
+
+@section scripts {
+<script src="~/js/cart.js" asp-append-version="true"></script>
+}

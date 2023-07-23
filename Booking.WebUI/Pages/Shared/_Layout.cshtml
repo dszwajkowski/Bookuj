@@ -1,0 +1,83 @@
+﻿@inject SignInManager<Booking.Domain.Entities.User> SignInManager
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Booking.WebUI</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/font-awesome/css/all.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Booking.WebUI.styles.css" asp-append-version="true" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/family=Courier+Prime" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-dark mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand text-light" asp-page="/Index">Bookuj</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <div class="container-fluid">
+                        <ul class="navbar-nav flex-grow-1" style="list-style: none;">
+                            <li class="nav-item">
+                                <a class="nav-link text-light" asp-page="/Offer/List">Wszystkie oferty</a>
+                            </li>
+                            @if (SignInManager.IsSignedIn(User))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle text-light" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Moje oferty
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdown">
+                                        <li><a class="dropdown-item text-light" asp-page="/User/Index" asp-route-username="@User.Identity?.Name">Moje oferty</a></li>
+                                        <li><a class="dropdown-item text-light" asp-page="/Offer/My/Reservations">Rezerwacje moich ofert</a></li>
+                                        <li><hr class="dropdown-divider bg-light"></li>
+                                        <li><a class="dropdown-item text-light" asp-page="/Offer/Create">Dodaj ofertę</a></li>
+                                    </ul>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-light" asp-page="/Order/My">Zamówienia</a>
+                                </li>
+                                if (User.IsInRole("Admin"))
+                                {
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle text-light" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            Panel administratora
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdown">
+                                            <li><a class="dropdown-item text-light" asp-page="/Admin/Users/Index">Użytkownicy</a></li>
+                                            <li><a class="dropdown-item text-light" asp-page="/Admin/Reservations">Rezerwacje</a></li>
+                                        </ul>
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                    <a asp-page="/Cart/Index">
+                        <i class="fa fa-shopping-cart fa-lg text-light"></i>
+                    </a>
+                    <partial name="_LoginPartial" />
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

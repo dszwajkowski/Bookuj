@@ -1,0 +1,59 @@
+﻿@page
+@using Booking.Application.Dtos
+@using Booking.WebUI.Pages.Shared
+@model Bookuj.WebUI.Pages.Admin.ReservationsModel
+@{
+}
+
+<partial name="_MessagePartial" for="StatusMessage" />
+@if (Model.Reservations?.Data is not null)
+{
+    <div class="table-responive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Oferta</th>
+                    <th>ID opcji noclegowej</th>
+                    <th>Informacje o opcji noclegowej</th>
+                    <th>Pobyt od</th>
+                    <th>Pobyt do</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model.Reservations.Data)
+                {
+                    <tr>
+                        <td>@r.ID</td>
+                        <td><a class="link-dark" asp-page="/Offer/Details" asp-route-id="@r.Offer?.ID">@r.Offer?.Title</a></td>
+                        <td>@r.LodgingOption?.ID</td>
+                        <td>
+                            <i class="fa fa-@(r.LodgingOption?.PersonCount == 1 ? "user" : "user-friends") text-dark"></i> x @r.LodgingOption?.PersonCount
+                            <i class="fa fa-bed text-dark"></i> x @r.LodgingOption?.BedCount
+                            <i class="fa fa-door-open text-dark"></i> x @r.LodgingOption?.RoomCount
+                            <i class="fa fa-dice-d6 text-dark"></i> @r.LodgingOption?.Size
+                            <i class="fa fa-money-bill-alt text-dark"></i> @r.LodgingOption?.Price
+                        </td>
+                        <td>@r.DateFrom.ToShortDateString()</td>
+                        <td>@r.DateTo.ToShortDateString()</td>
+                        <td>@r.Status?.Name</td>
+                        <td>
+                            @if (r.DateFrom > DateTime.UtcNow.AddDays(2) && r.Status?.ID < 4)
+                            {
+                                <form method="post" asp-page-handler="CancelReservation">
+                                    <input type="hidden" asp-for="@Model.ReservationID" value="@r.ID" />
+                                    <button class="btn btn-danger">Anuluj rezerwację</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <form method="post">
+            <partial name="_PaginatedListPartial" model=@(_PaginatedListPartialModel.Create<ReservationDto>(Model.Reservations, "UpdateFilters", "Nie znaleziono żadnych rezerwacji.")) />
+        </form>
+    </div>
+}

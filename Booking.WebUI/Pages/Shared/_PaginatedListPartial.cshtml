@@ -1,0 +1,125 @@
+﻿@model Booking.WebUI.Pages.Shared._PaginatedListPartialModel
+
+@if (Model?.PaginatedList?.PageCount > 1)
+{
+    int pageIterator = Model.PaginatedList.PageNumber;
+    <nav class="nav justify-content-center">
+        <ul class="pagination">
+            @if (Model.PaginatedList.HasPreviousPage)
+            {
+                <li class="page-item">
+                    @*                <button class="page-link" type="submit" asp-route-PageNumber="@(Model.PaginatedList.PageNumber - 1)">
+                        &lt
+                        </button>*@
+                    <button class="page-link" asp-page-handler="@Model.Handler" asp-route-PageNumber="@(Model.PaginatedList.PageNumber - 1)" 
+                    asp-route-PageSize="@Model.PaginatedList.PageSize">
+                        &lt
+                    </button>
+                </li>
+                <li class="page-item">
+                    @*                <button class="page-link" type="submit" asp-route-PageNumber="1">
+                        1
+                        </button>*@
+                    <button class="page-link" asp-page-handler="@Model.Handler" asp-route-PageNumber="1" asp-route-PageSize="@Model.PaginatedList.PageSize">
+                        1
+                    </button>
+                </li>
+            }
+            else
+            {
+                <li class="page-item disabled">
+                    <span class="page-link">&lt</span>
+                </li>
+                <li class="page-item active">
+                    <span class="page-link">1</span>
+                </li>
+            }
+
+            @{
+                int pageCount = Model.PaginatedList.PageCount;
+            }
+            @{
+                int middleElementsCount = pageCount > 4 ? 3 : pageCount == 4 ? 2 : pageCount == 3 ? 1 : 0;
+            }
+            @{
+                pageIterator = pageIterator + middleElementsCount > pageCount ? pageCount - middleElementsCount : pageIterator - 1;
+            }
+            @{
+                pageIterator = middleElementsCount > 2 ? (pageIterator < middleElementsCount ? 2 : pageIterator) : (pageIterator <= middleElementsCount ? 2 : pageIterator);
+            }
+
+            @for (int i = pageIterator; i < pageIterator + middleElementsCount; i++)
+            {
+                <li class="@(Model.PaginatedList.PageNumber == i ? "page-item active" : "page-item")">
+                    @*                <button class="page-link" type="submit" asp-route-PageNumber="@i">
+                        @i
+                        </button>*@
+                    <button class="page-link" asp-page-handler="@Model.Handler" asp-route-PageNumber="@i" asp-route-PageSize="@Model.PaginatedList.PageSize"> 
+                        @*asp-route-PageSize="@Model.PageSize">*@
+                        @i
+                    </button>
+                </li>
+            }
+
+            @if (Model.PaginatedList.HasNextPage)
+            {
+                <li class="page-item">
+                    @* <button class="page-link" type="submit" asp-route-PageNumber="@Model.PaginatedList.PageCount">
+                        @Model.PaginatedList.PageCount
+                        </button>*@
+                    <button class="page-link" asp-page-handler="@Model.Handler" asp-route-PageNumber="@Model.PaginatedList.PageCount" asp-route-PageSize="@Model.PaginatedList.PageSize">
+                        @*asp-route-PageSize="@Model.PageSize">*@
+                        @Model.PaginatedList.PageCount
+                    </button>
+                </li>
+                <li class="page-item">
+                    <button class="page-link" type="submit" asp-page-handler="@Model.Handler" asp-route-PageNumber="@(Model.PaginatedList.PageNumber + 1)" asp-route-PageSize="@Model.PaginatedList.PageSize">
+                        @*asp-route-PageSize="@Model.PageSize">*@
+                        &gt;
+                    </button>
+                    @* <a class="page-link" type="submit" asp-route-PageNumber="@(Model.PaginatedList.PageNumber + 1)">
+                        &gt;
+                        </a>*@
+                </li>
+            }
+            else
+            {
+                <li class="page-item active">
+                    <span class="page-link">@Model.PaginatedList.PageCount</span>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">></span>
+                </li>
+            }
+        </ul>
+    </nav>
+    @*    <form method="post" asp-page-handler="@Model.Handler" id="pageSizeForm">
+        <select asp-for="PageSize" id="pageSizeSelect">
+        <option value="10">10</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+        <option value="75">75</option>
+        <option value="100">100</option>
+        </select>
+        </form>*@
+}
+else if (Model?.PaginatedList?.PageCount == 1)
+{
+    <nav class="nav justify-content-center">
+        <ul class="pagination">
+            <li class="page-item disabled">
+                <span class="page-link">&lt</span>
+            </li>
+            <li class="page-item active">
+                <span class="page-link">1</span>
+            </li>
+            <li class="page-item disabled">
+                <span class="page-link">></span>
+            </li>
+        </ul>
+    </nav>
+}
+else
+{
+    <p>@Model.EmptyListErrorMessage</p>
+}

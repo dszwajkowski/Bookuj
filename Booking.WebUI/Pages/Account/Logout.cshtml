@@ -1,0 +1,20 @@
+﻿@page "/Logout"
+@model Booking.WebUI.Pages.Account.LogoutModel
+@{
+    ViewData["Title"] = "Wyloguj się.";
+}
+
+<header>
+    @{
+        if (User.Identity.IsAuthenticated)
+        {
+            <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
+                <button type="submit" class="nav-link btn btn-link text-dark">Kliknij tutaj aby się wylogować.</button>
+            </form>
+        }
+        else
+        {
+            <p>Pomyślnie wylogowano.</p>
+        }
+    }
+</header>

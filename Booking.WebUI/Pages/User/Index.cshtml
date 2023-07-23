@@ -1,0 +1,39 @@
+﻿@page "{username}"
+@model Booking.WebUI.Pages.User.IndexModel
+@using Booking.Application.Common.Interfaces
+@using Booking.Domain.Entities
+@using Microsoft.AspNetCore.Identity
+@using Booking.WebUI.Pages.Shared
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
+@inject ICurrentUserService CurrentUser
+@{
+    ViewData["Title"] = $"Profil użytkownika { Model.UserDto?.Username }";
+}
+<section>
+    <partial name="_MessagePartial" for="StatusMessage" />
+    <div class="row">
+        <div class="col-3">
+            <div class="text-center">
+                <img src="@Model.UserDto?.AvatarPath"
+                     class="rounded-circle"
+                     height="100"
+                     alt="Awatar" />
+            </div>
+            <h1 class="text-center">@Model.UserDto?.Username</h1>
+            <p>@Model.UserDto?.Description</p>
+        </div>
+        <div class="col-9">
+            <div>
+                <h1>Oferty użytkownika @Model.UserDto?.Username</h1>
+                @if (Model.Offers is not null)
+                {
+                    foreach (var offer in Model.Offers.Data)
+                    {
+                        <partial name="_OfferCardPartial" model="@(new _OfferCardPartialModel(offer, Model.OfferFilters, "DeleteOffer"))" />
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</section>

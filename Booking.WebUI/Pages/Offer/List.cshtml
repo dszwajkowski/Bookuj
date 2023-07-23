@@ -1,0 +1,164 @@
+﻿@page "/Offer"
+@model Booking.WebUI.Pages.Offer.ListModel
+@inject SignInManager<Booking.Domain.Entities.User> SignInManager
+@using Booking.Application.Common.Interfaces
+@using Booking.Application.Dtos
+@using Booking.WebUI.Pages.Shared
+@inject ICurrentUserService CurrentUser
+@{
+    ViewData["Title"] = "Lista ofert";
+}
+
+<section class="offerList">
+    <partial name="_MessagePartial" for="StatusMessage" />
+    @*    <div style="
+        position: fixed;
+        top: 90%;
+        left: 50%;
+        z-index: 10000;
+        transform: translate(-50%, -50%);
+        background: rgba(247, 201, 241, 0.4);
+        padding: .5rem 1rem;
+        border-radius: 30px;
+        ">
+        <div class="d-block d-sm-none">Extra Small (xs)</div>
+        <div class="d-none d-sm-block d-md-none">Small (sm)</div>
+        <div class="d-none d-md-block d-lg-none">Medium (md)</div>
+        <div class="d-none d-lg-block d-xl-none">Large (lg)</div>
+        <div class="d-none d-xl-block d-xxl-none">X-Large (xl)</div>
+        <div class="d-none d-xxl-block">XX-Large (xxl)</div>
+        </div>*@
+
+    <div class="row">
+        <div class="col-3">
+            <h3>Filtry</h3>
+            <form method="post" asp-page-handler="UpdateFilters">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-floating">
+                    <input type="date" asp-for="Filters.DateFrom" class="form-control" min="@DateTime.Now.Date.ToString("yyyy-MM-dd")" />
+                    <label>Pobyt od:</label>
+                </div>
+                <div class="form-floating">
+                    <input type="date" asp-for="Filters.DateTo" class="form-control" min="@DateTime.Now.Date.AddDays(1).ToString("yyyy-MM-dd")" />
+                    <label class="control-label">do:</label>
+                </div>
+                <div class="form-floating">
+                    <input asp-for="Filters.PersonCount" class="form-control" placeholder="2" />
+                    <label>Liczba osób:</label>
+                </div>
+                <div class="form-floating">
+                    <select asp-for="Filters.City" asp-items="@Model.Cities" class="form-select">
+                        <option>Wybierz miasto</option>
+                    </select>
+                    <label>Miasto</label>
+                </div>
+                <div class="row">
+                    <div class="col-8">
+                        <div class="form-floating">
+                            <input asp-for="Filters.PriceMin" class="form-control" placeholder="0" />
+                            <label>Cena od:</label>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="form-floating">
+                            <input asp-for="Filters.PriceMax" class="form-control" placeholder="9999" />
+                            <label>do:</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-floating">
+                    <input asp-for="Filters.RoomCount" class="form-control" placeholder="1" />
+                    <label>Ilość pokoi:</label>
+                </div>
+                <div class="row">
+                    <div class="col-8">
+                        <div class="form-floating">
+                            <input asp-for="Filters.SizeMin" class="form-control" placeholder="0" />
+                            <label>Powierzchnia od:</label>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="form-floating">
+                            <input asp-for="Filters.SizeMax" class="form-control" placeholder="100" />
+                            <label for="Filters_SizeMax">do:</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div>
+                        <button type="submit" class="btn btn-dark form-control">Szukaj</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-9">
+            <h3>Oferty</h3>
+            <div>
+                @if (Model.Offers is not null)
+                {
+                    @foreach (var offer in Model.Offers.Data)
+                    {
+                        <partial name="_OfferCardPartial" model="@(new _OfferCardPartialModel(offer, Model.Filters))" />
+                    }
+                }
+            </div>
+            @* <form method="get">
+                @foreach (var property in Model.Filters.GetType().GetProperties())
+                {
+                if (property.GetValue(Model.Filters) is not null)
+                {
+                <!input type="hidden" name="Filters.@property.Name" value="@property.GetValue(Model.Filters)" />
+                }
+                }
+                @*<input type="hidden" asp-for="Filters.City" />
+                <input type="hidden" asp-for="Filters.DateFrom" />
+                <input type="hidden" asp-for="Filters.DateTo" />
+                <input type="hidden" asp-for="Filters.PersonCount" />
+                <input type="hidden" asp-for="Filters.RoomCount" />
+                <input type="hidden" asp-for="Filters.BedCount" />
+                <input type="hidden" asp-for="Filters.PriceMin" />
+                <input type="hidden" asp-for="Filters.PriceMax" />
+                <input type="hidden" asp-for="Filters.SizeMin" />
+                <input type="hidden" asp-for="Filters.SizeMax" />
+                <input type="hidden" asp-for="Filters.Author" />
+                <partial name="_PaginatedListPartial" model=@(_PaginatedListPartialModel.Create<OfferBriefDto>(Model.Offers, "", "Nie znaleziono ofert o podanych parametrach.")) />
+                </form>*@
+            <form method="post">
+                <input type="hidden" asp-for="Filters.City" />
+                <input type="hidden" asp-for="Filters.DateFrom" />
+                <input type="hidden" asp-for="Filters.DateTo" />
+                <input type="hidden" asp-for="Filters.PersonCount" />
+                <input type="hidden" asp-for="Filters.RoomCount" />
+                <input type="hidden" asp-for="Filters.BedCount" />
+                <input type="hidden" asp-for="Filters.PriceMin" />
+                <input type="hidden" asp-for="Filters.PriceMax" />
+                <input type="hidden" asp-for="Filters.SizeMin" />
+                <input type="hidden" asp-for="Filters.SizeMax" />
+                <input type="hidden" asp-for="Filters.AuthorID" />
+                <partial name="_PaginatedListPartial" model=@(_PaginatedListPartialModel.Create<OfferBriefDto>(Model.Offers, "UpdateFilters", "Nie znaleziono ofert o podanych parametrach.")) />
+            </form>
+        </div>
+    </div>
+</section>
+
+@*<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    const list = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+    list.map((el) => {
+    let opts = {
+    animation: false,
+    }
+    if (el.hasAttribute('data-bs-content-id')) {
+    opts.content = document.getElementById(el.getAttribute('data-bs-content-id')).innerHTML;
+    opts.html = true;
+    }
+    new bootstrap.Popover(el, opts);
+    })
+    var popover = new bootstrap.Popover(document.querySelector('.popover-dismiss'),
+    {
+    trigger: 'focus'
+    })
+    </script>*@
+

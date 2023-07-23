@@ -1,0 +1,20 @@
+﻿@page "{username}"
+@model Booking.WebUI.Pages.Admin.Users.Manage.RolesModel
+@{
+}
+
+<h3>Edytuj role użytkownika @Model.Username</h3>
+<form method="post">
+    @for (int i = 0; i < Model.UserRoles.Count; i++)
+    {
+        <div>
+            <input id="role@i" type="checkbox" asp-for="@Model.UserRoles[i].IsInRole" />
+            <label for="role@i">@Model.UserRoles[i].Name</label>
+            @Html.HiddenFor(x => x.UserRoles[i].Name)
+        </div>
+    }
+    <div class="d-inline">
+        <a class="btn btn-dark" asp-page="/Admin/Users/Index">Powrót</a>
+        <button type="submit" class="btn btn-dark">Zapisz</button>
+    </div>
+</form>

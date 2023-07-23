@@ -1,0 +1,74 @@
+﻿@using Booking.Application.Common.Interfaces
+@using Booking.Domain.Entities
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
+@inject ICurrentUserService CurrentUser
+@if (SignInManager.IsSignedIn(User))
+{
+    var user = await UserManager.Users
+        .Include(u => u.Avatar)
+        .SingleAsync(u => u.Id == CurrentUser.ID);
+
+    <div>
+        @if (user.Avatar is not null)
+        {
+            <a class="nav-link dropdown-toggle d-flex align-items-center text-light"
+       href="#"
+       id="navbarDropdownMenuLink"
+       role="button"
+       data-bs-toggle="dropdown"
+       aria-expanded="false">
+                <img src="@user.Avatar.FullPath"
+             class="rounded-circle"
+             height="30"
+             alt="Awatar" />
+            </a>
+        }
+        else
+        {
+            <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                @User.Identity?.Name
+            </button>
+        }
+        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+            <li><a class="dropdown-item" asp-page="/User/Index" asp-route-username="@User.Identity?.Name">Mój profil</a></li>
+            <li><a class="dropdown-item" asp-page="/Account/Edit/Profile">Ustawienia</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+                <form class="form-inline" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
+                    <button class="dropdown-item">Wyloguj</button>
+                </form>
+            </li>
+        </ul>
+    </div>
+    @*<div class="btn-group">
+        <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        @User.Identity?.Name
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+        <li><a class="dropdown-item" asp-page="/User/Index" asp-route-username="@User.Identity?.Name">Mój profil</a></li>
+        <li><a class="dropdown-item" asp-page="/Account/Edit/Profile">Ustawienia</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li>
+        <form class="form-inline" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
+        <button class="dropdown-item">Wyloguj</button>
+        </form>
+        </li>
+        </ul>
+        </div>*@
+}
+else
+{
+    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+        <ul class="navbar-nav flex-grow-1" style="list-style: none;">
+            <li class="nav-item">
+                <a class="nav-link text-light" asp-page="/Account/Register">Zarejestruj</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-light" asp-page="/Account/Login">Zaloguj</a>
+            </li>
+        </ul>
+    </div>
+}

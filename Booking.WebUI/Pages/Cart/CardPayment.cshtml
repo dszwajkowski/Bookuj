@@ -1,0 +1,39 @@
+﻿@page
+@model Booking.WebUI.Pages.Cart.CardPaymentModel
+@{
+
+}
+<section class="checkout">
+    <form method="post" asp-page-handler="CreateOffer">
+        <h2 class="text-center">Uzupełnij dane</h2>
+        <hr />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-floating">
+            <input asp-for="Input.CardNumber" class="form-control" autocomplete="cc-number" aria-required="true" placeholder="Numer karty" />
+            <label asp-for="Input.CardNumber"></label>
+            <span asp-validation-for="Input.CardNumber" class="text-danger"></span>
+        </div>
+        <div class="row">
+            <div class="col-8">
+                <div class="form-floating">
+                    <input type="month" class="form-control" min="@DateTime.Now.ToString("yyyy-MM")" autocomplete="cc-exp">
+                    <label asp-for="Input.ExpirationDate"></label>
+                    <span asp-validation-for="Input.ExpirationDate" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-floating">
+                    <input type="text" class="form-control" asp-for="Input.Cvv" placeholder="CVV" />
+                    <label asp-for="Input.Cvv"></label>
+                    <span asp-validation-for="Input.Cvv" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        @Html.HiddenFor(x => x.OrderID)
+        <button type="submit" class="w-100 btn btn-lg btn-dark mt-3">Zapłać</button>
+    </form>
+</section>
+
+@section Scripts {
+<partial name="_ValidationPartial" />
+}

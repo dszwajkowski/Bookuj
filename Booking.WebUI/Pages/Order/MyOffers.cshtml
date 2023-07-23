@@ -1,0 +1,43 @@
+﻿@page
+@using Booking.Application.Dtos
+@using Booking.WebUI.Pages.Shared
+@model Booking.WebUI.Pages.Order.MyOffersModel
+@{
+    ViewData["Title"] = "Zamówienia do moich ofert";
+}
+
+@if (Model.Orders?.Data is not null)
+{
+    <div class="table-responive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Numer zamówienia</th>
+                    <th>Data zamówienia</th>
+                    <th>Status</th>
+                    <th>Data finalizacji</th>
+                    <th>Szczegóły</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model.Orders.Data)
+                {
+                    <tr>
+                        <td>@order.ID</td>
+                        <td>@order.DateCreated</td>
+                        <td>
+                            <p class="@(order.IsFinalized == true ? "text-success" : "text-danger")">
+                                @(order.IsFinalized == true ? "Zfinalizowane" : "Niezfinalizowane")
+                            </p>
+                        </td>
+                        <td>@order.DateFinalized</td>
+                        <td><a asp-page="/Order/Details" asp-route-id="@order.ID" class="link-dark">Zobacz szczegóły</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <form method="post">
+            <partial name="_PaginatedListPartial" model=@(_PaginatedListPartialModel.Create<OrderDto>(Model.Orders, "UpdateFilters", "Nie znaleziono żadnych zamówień.")) />
+        </form>
+    </div>
+}

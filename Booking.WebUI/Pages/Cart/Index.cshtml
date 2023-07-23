@@ -1,0 +1,66 @@
+﻿@page
+@model Booking.WebUI.Pages.Cart.IndexModel
+@{
+}
+@Html.AntiForgeryToken()
+<partial name="_MessagePartial" for="StatusMessage" />
+
+<h1><i class="fa fa-shopping-cart"></i>Koszyk</h1>
+@if (Model.Cart is not null && Model.Cart.Reservations.Count > 0)
+{
+    <div class="row">
+        <div class="col-6">
+            @foreach (var item in Model.Cart.Reservations)
+            {
+                decimal reservationPrice = @Math.Round(item.TotalPrice, 2, MidpointRounding.AwayFromZero);
+                <div class="card mb-2">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a class="link-dark" asp-page="/Offer/Details" asp-route-ID="@item.Offer?.ID">@item.Offer?.Title</a>
+                            <a class="deleteFromCart float-end" href="/Cart?handler=DeleteFromCart&reservationID=@item.ID" value="@reservationPrice">
+                                <i class="fa fa-trash text-dark"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p>Od @item.DateFrom.ToShortDateString()</p>
+                        <p>Do @item.DateTo.ToShortDateString()</p>
+                        <p>Cena za noc: @Math.Round(item.LodgingOption.Price, 2, MidpointRounding.AwayFromZero)</p>
+                        <p>Łącznie: @reservationPrice</p>
+                        <div class="d-inline">
+                            <i class="fa fa-@(item.LodgingOption?.PersonCount == 1 ? "user" : "user-friends")"> x @item.LodgingOption?.PersonCount</i>
+                            <i class="fa fa-bed"> x @item.LodgingOption?.BedCount</i>
+                            <i class="fa fa-door-open text-dark"></i> x @item.LodgingOption?.RoomCount
+                            <i class="fa fa-dice-d6 text-dark"></i> @item.LodgingOption?.Size
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="col-6">
+            <div class="card">
+                <div class="card-header">
+                    <a>Podsumowanie</a>
+                </div>
+                <div class="card-body">
+                    <p>Do zapłaty:</p>
+                    @{
+                        decimal cartSum = @Math.Round(Model.Cart.Reservations.Sum(r => r.TotalPrice), 2, MidpointRounding.AwayFromZero);
+                    }
+                    <p id="cartSum" value="@cartSum">@cartSum PLN</p>
+                </div>
+                <a class="btn btn-dark m-2" asp-page="/Cart/Checkout">Przejdź dalej</a>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <p>Twój koszyk jest pusty.</p>
+}
+
+@section scripts{
+<script src="~/js/cart.js" asp-append-version="true"></script>
+}
+
+

@@ -1,0 +1,106 @@
+﻿@page
+@model Booking.WebUI.Pages.Admin.IndexModel
+@using Booking.Application.Common.Interfaces
+@using Booking.Application.Dtos
+@using Booking.WebUI.Pages.Shared
+@inject ICurrentUserService CurrentUser
+@{
+}
+<h1>Użytkownicy</h1>
+
+@if (Model.Users is not null)
+{
+    <div class="table-responive table-hover">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nazwa</th>
+                    <th>E-mail</th>
+                    <th class="text-center">Potwierdzony</th>
+                    <th>Koniec blokady</th>
+                    <th>Role</th>
+                    <th>Akcje</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model.Users.Data)
+                {
+                    <tr @(user.IsBlocked ? "class=table-danger" : "")>
+                        <td><a class="link-dark" asp-page="/User/Index" asp-route-username="@user.UserName">@user.UserName</a></td>
+                        <td>@user.Email</td>
+                        <td class="text-center"><input type="checkbox" @(user.EmailConfirmed == true ? "checked" : "") disabled /></td>
+                        <td>@user.LockUntil</td>
+                        <td>@String.Join(", ", user.Roles.Where(r => r.IsInRole == true).Select(r => r.Name))</td>
+                        <td>
+                            @if (user.ID != CurrentUser.ID)
+                            {
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#banModal"
+                            data-bs-username="@user.UserName" data-bs-userid="@user.ID" data-bs-lockuntil="@user.LockUntil?.ToString("yyyy-MM-ddTHH:mm")">
+                                    @(user.IsBlocked ? "Zmień blokadę" : "Zablokuj")
+                                </button>
+                            }
+                            <a asp-page="/Admin/Users/Manage/Roles" asp-route-username="@user.UserName" type="button" class="btn btn-danger">Zarządzaj rolami</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <form method="post">
+        <partial name="_PaginatedListPartial" model=@(_PaginatedListPartialModel.Create<UserBriefDto>(Model.Users, "UpdateFilters")) />
+    </form>
+}
+
+@* Ban user modal *@
+<div class="modal fade" id="banModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-center" id="exampleModalLabel">Zablokuj użytkownika</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="blockUserForm" method="post" asp-page-handler="BlockUser">
+                    <input name="UserID" type="hidden" class="form-control userid" />
+                    <input name="PageNumber" type="hidden" value="@Model.Users?.PageNumber" />
+                    <input name="PageSize" type="hidden" value="@Model.Users?.PageSize" />
+                    <div class="mb-3">
+                        <label for="username" class="col-form-label">Użytkownik:</label>
+                        <input type="text" class="form-control username" id="username" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label name="LockUntil" class="col-form-label">Zablokuj do:</label>
+                        @*<input asp-for="LockUntil" type="datetime-local" class="form-control lockuntil" />*@
+                        <input name="LockUntil" type="datetime-local" class="form-control lockuntil" min="@DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm")" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Zamknij</button>
+                <button type="submit" form="blockUserForm" class="btn btn-danger" value="update">Zablokuj</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+<script>
+    var exampleModal = document.getElementById('banModal')
+    exampleModal.addEventListener('show.bs.modal', function (event) {
+      var button = event.relatedTarget;
+      var user = button.getAttribute('data-bs-username');
+      var userID = button.getAttribute('data-bs-userid');
+      var lockUntil = button.getAttribute('data-bs-lockuntil');
+      var modalTitle = exampleModal.querySelector('.modal-title');
+      var inputUsername = exampleModal.querySelector('.modal-body .username');
+      var inputUserID = exampleModal.querySelector('.modal-body .userid');
+      var inputLockUntil = exampleModal.querySelector('.modal-body .lockuntil');
+
+      modalTitle.textContent = 'Zablokuj użytkownika ' + user;
+      inputUsername.setAttribute("value", user);
+      inputUserID.setAttribute("value", userID);
+      inputLockUntil.setAttribute("value", lockUntil);
+    })
+
+</script>
+}

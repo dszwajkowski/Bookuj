@@ -1,0 +1,78 @@
+﻿@page
+@model Booking.WebUI.Pages.Profile.Edit.ProfileModel
+@using Booking.Domain.Entities
+@inject SignInManager<User> SignInManager
+@{
+    ViewData["Title"] = "Edytuj profil";
+}
+<section class="identity">
+    <partial name="_MessagePartial" for="StatusMessage" />
+    <ul class="nav nav-pills nav-justified">
+        <li class="nav-item">
+            <a class="nav-link active bg-dark" asp-page="/Account/Edit/Profile">Profil</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-page="/Account/Edit/Security" aria-current="page">Bezpieczeństwo</a>
+        </li>
+    </ul>
+    <hr />
+    <form method="post" enctype="multipart/form-data">
+        <div class="text-center">
+            <img src="@Model.UserDto.AvatarPath"
+                 class="rounded-circle"
+                 height="100"
+                 alt="Awatar" />
+        </div>
+        <label>Zmień awatar:</label>
+        <div class="form-group">
+            <input asp-for="UserDto.Avatar" type="file" class="form-control">
+        </div>
+        <hr />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-floating">
+            <input asp-for="UserDto.Username" class="form-control" disabled />
+            <label asp-for="UserDto.Username"></label>
+        </div>
+        <div class="form-floating">
+            <input asp-for="UserDto.Email" class="form-control" />
+            <label asp-for="UserDto.Email"></label>
+            <span asp-validation-for="UserDto.Email" class="text-danger"></span>
+        </div>
+        <div class="form-floating">
+            <input asp-for="UserDto.PhoneNumber" class="form-control" />
+            <label asp-for="UserDto.PhoneNumber"></label>
+            <span asp-validation-for="UserDto.PhoneNumber" class="text-danger"></span>
+        </div>
+        <div class="form-floating">
+            <input asp-for="UserDto.FirstName" class="form-control" />
+            <label asp-for="UserDto.FirstName"></label>
+            <span asp-validation-for="UserDto.FirstName" class="text-danger"></span>
+        </div>
+        <div class="form-floating">
+            <input asp-for="UserDto.SecondName" class="form-control" />
+            <label asp-for="UserDto.SecondName"></label>
+            <span asp-validation-for="UserDto.SecondName" class="text-danger"></span>
+        </div>
+        <div class="form-floating">
+            <input asp-for="UserDto.AddressLine" class="form-control" />
+            <label asp-for="UserDto.AddressLine"></label>
+            <span asp-validation-for="UserDto.AddressLine" class="text-danger"></span>
+        </div>
+        <div class="form-floating">
+            <select asp-for="UserDto.CityID" asp-items="@Model.Cities" class="form-select">
+                <option>Wybierz miasto</option>
+            </select>
+            <label asp-for="UserDto.CityID"></label>
+        </div>
+        <div class="form-floating">
+            <input asp-for="UserDto.PostalCode" class="form-control" />
+            <label asp-for="UserDto.PostalCode"></label>
+            <span asp-validation-for="UserDto.PostalCode" class="text-danger"></span>
+        </div>
+        <div class="form-floating">
+            <textarea asp-for="UserDto.Description" class="form-control" placeholder="Dodaj opis który będzie widoczny na twoim profilu" id="floatingTextarea"></textarea>
+            <label asp-for="UserDto.Description"></label>
+        </div>
+        <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-dark mt-2">Zapisz</button>
+    </form>
+</section>

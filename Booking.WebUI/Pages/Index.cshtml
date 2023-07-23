@@ -1,0 +1,49 @@
+﻿@page
+@model IndexModel
+@inject SignInManager<Booking.Domain.Entities.User> SignInManager
+@{
+    Layout = "Index_Layout";
+    ViewData["Title"] = "Strona główna";
+}
+<div class="position-absolute top-50 start-50 translate-middle">
+    <h1 class="text-light text-border-black text-center">Witaj@(SignInManager.IsSignedIn(User) ? " " + User.Identity?.Name : "")!</h1>
+    <h1 class="text-light text-border-black text-center">Dokąd się wybierasz?</h1>
+    <form class="form-inline" method="post">
+
+        <div class="row g-0">
+            <div class="col">
+                <label class="text-light text-border-black">Miasto</label>
+                <div class="input-group">
+                    <select asp-for="Filters.City" asp-items="@Model.Cities" class="form-control">
+                        <option>Wybierz miasto</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col">
+                <label class="text-light text-border-black">Od</label>
+                <div class="input-group">
+                    <input type="date" asp-for="Filters.DateFrom" class="form-control" min="@DateTime.Now.Date.ToString("yyyy-MM-dd")" />
+                </div>
+            </div>
+            <div class="col">
+                <label class="text-light text-border-black">Do</label>
+                <div class="input-group">
+                    <input type="date" asp-for="Filters.DateTo" class="form-control" min="@DateTime.Now.Date.AddDays(1).ToString("yyyy-MM-dd")" />
+                </div>
+            </div>
+            <div class="col">
+                <label class="text-light text-border-black">Liczba osób</label>
+                <div class="input-group">
+                    <input asp-for="Filters.PersonCount" class="form-control" placeholder="2" />
+                </div>
+            </div>
+            <div class="col">
+                <label></label>
+                <div class="input-group">
+                    <input type="hidden" class="form-control">
+                    <button type="submit" value="Szukaj" class="btn btn-dark">Szukaj</button>
+                </div>
+            </div>
+        </div>   
+    </form>
+</div>

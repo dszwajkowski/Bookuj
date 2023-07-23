@@ -1,0 +1,135 @@
+﻿@page "/Order/{orderID}"
+@model Booking.WebUI.Pages.Order.DetailsModel
+@{
+}
+
+<partial name="_MessagePartial" for="StatusMessage" />
+<p>Identyfikator zamówienia: @Model.Order.ID</p>
+<p>Data złożenia zamówienia: @Model.Order.DateCreated</p>
+<p>Kwota zamówienia: @Math.Round(Model.Order.Reservations.Sum(r => r.TotalPrice), 2, MidpointRounding.AwayFromZero)</p>
+<p>
+    Status zamówienia:
+    <span class="@(Model.Order.IsFinalized ? "text-success" : "text-danger")">
+        @(Model.Order.IsFinalized ? "Zfinalizowane" : "Niezfinalizowane")
+    </span>
+    @if (!Model.Order.IsFinalized && Model.Order.PaymentMethod.ID == 3)
+    {
+        bool allowPayment = true;
+        foreach (var r in Model.Order.Reservations)
+        {
+            if (r.DateFrom < DateTime.Now) allowPayment = false;
+        }
+        if (allowPayment)
+        {
+            <span>
+                <a class="btn btn-dark" asp-page="/Cart/CardPayment" asp-route-orderID="@Model.Order.ID">Opłać</a>
+            </span>
+        }
+    }
+</p>
+@if (Model.Order.IsFinalized)
+{
+    <p>Data finalizacji: @Model.Order.DateFinalized</p>
+}
+<p>Sposób płatności: @Model.Order.PaymentMethod.Name</p>
+
+<div class="table-responive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Oferta</th>
+                <th>Od</th>
+                <th>Do</th>
+                <th>Cena</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in Model.Order.Reservations)
+            {
+                <tr>
+                    <td><a class="link-dark" asp-page="/Offer/Details" asp-route-id="@r.Offer?.ID">@r.Offer?.Title</a></td>
+                    <td>@r.DateFrom.ToShortDateString()</td>
+                    <td>@r.DateTo.ToShortDateString()</td>
+                    <td>@Math.Round(r.TotalPrice, 2, MidpointRounding.AwayFromZero)</td>
+                    <td>
+                        @if (r.DateFrom > DateTime.UtcNow.AddDays(2) && r.Status?.ID < 4)
+                        {
+                            <form method="post" asp-page-handler="CancelReservation">
+                                <input type="hidden" asp-for="OrderID" />
+                                <input type="hidden" asp-for="ReservationID" value="@r.ID" />
+                                <button class="btn btn-danger">Anuluj rezerwację</button>
+                            </form>
+                        }
+                        else if (r.DateFrom < DateTime.UtcNow)
+                        {
+                            <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#opinionModal" data-bs-offerid="@r.Offer?.ID" data-bs-title="@r.Offer?.Title">Dodaj opinię</button>
+                        }
+                        else if (r.Status?.ID == 4)
+                        {
+                            <p class="text-danger">Rezerwacja anulowana</p>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@* Opinion modal *@
+<div class="modal fade" id="opinionModal" tabindex="-1" aria-labelledby="opinionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-center" id="opinionModalLabel">Dodaj opinię</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addOpinionForm" method="post" asp-page-handler="AddOpinion">
+                    @Html.HiddenFor(x => x.OrderID)
+                    <div class="mb-3">
+                        <label for="offer-name" class="col-form-label">Nazwa oferty:</label>
+                        <input type="text" class="form-control title" id="offer-name" disabled>
+                        <input type="hidden" asp-for="OfferID" class="form-control offerid" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="opinion-rating" class="col-form-label">Ocena:</label>
+                        <select asp-for="OpinionRating" id="opinion-rating">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="opinion-text" class="col-form-label">Komentarz:</label>
+                        <textarea asp-for="OpinionText" class="form-control" id="opinion-text"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Zamknij</button>
+                <button type="submit" form="addOpinionForm" class="btn btn-dark" value="update">Opublikuj</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+<script>
+    var opinionModal = document.getElementById('opinionModal')
+    opinionModal.addEventListener('show.bs.modal', function (event) {
+      var button = event.relatedTarget;
+      var offerID = button.getAttribute('data-bs-offerid');
+      var title = button.getAttribute('data-bs-title');
+
+      var modalBodyInput = opinionModal.querySelector('.modal-body .title');
+      var modalBodyInputHidden = opinionModal.querySelector('.modal-body .offerid');
+
+      modalBodyInput.setAttribute("value", title);
+      modalBodyInputHidden.setAttribute("value", offerID);
+    })
+
+</script>
+}

@@ -1,0 +1,144 @@
+* {
+    font-size: 100%;
+    font-family: 'Courier Prime', monospace;
+}
+
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin-bottom: 60px;
+}
+
+.text-border-black {
+    text-shadow: -1px 0 #778899, 0 1px #778899, 1px 0 #778899, 0 -1px #778899;
+}
+
+.lodgingOptions {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.bg-image {
+    background-image: url(../files/images/bg-by-aleks-dahlberg.jpg);
+    background-size: cover;
+}
+
+.carousel-inner {
+    max-height: 450px;
+    min-height: 450px;
+}
+
+.carousel-item img {
+    height: 450px;
+    object-fit: scale-down;
+}
+
+/*.carousel-control-next, .carousel-control-prev {
+    filter: invert(100%);
+}*/
+
+.line-clamp {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+}
+
+.active {
+    background-color: black;
+    border-color: black;
+}
+
+.offer-thumbnail {
+    width: 100%;
+    height: 14vw;
+}
+
+.card-desc {
+    overflow-wrap: anywhere;
+    word-wrap: break-word;
+    word-break: normal;
+    hyphens: auto;
+}
+
+.identity {
+    padding-left: 24vw;
+    padding-right: 24vw;
+}
+
+/*.offerList {
+    padding-left: 5vw;
+    padding-right: 5vw;
+}*/
+
+.offerDetails {
+    padding-left: 5vw;
+    padding-right: 5vw;
+}
+
+.offerOpinions {
+    padding-left: 15vw;
+    padding-right: 15vw;
+}
+
+.checkout {
+    padding-left: 24vw;
+    padding-right: 24vw;
+}
+/**/
+/*
+.carousel-control-next-icon {
+    height: 100px;
+    width: 100px;
+    outline: black;
+    background-size: 100%, 100%;
+    border-radius: 0%;
+    border: 1px solid black;
+    background-image: none;
+}*/
+
+/*.dropdown-toggle::after {
+    display: none;
+}*/
+/*
+.bg-test {
+    background-color: #242526;
+}*/
+
+.page-item.active .page-link {
+    background-color: black;
+    border-color: black;
+}
+
+.page-link, .page-link:hover {
+    color: black;
+}
+
+.justify {
+    text-align: justify;
+    text-justify: inter-word;
+}
+
+.custom-control-label:before {
+    background-color: red;
+}
+
+.custom-checkbox .custom-control-input:checked ~ .custom-control-label::before {
+    background-color: black;
+}
+
+.custom-checkbox .custom-control-input:checked ~ .custom-control-label::after {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath fill='white' d='M6.564.75l-3.59 3.612-1.538-1.55L0 4.26 2.974 7.25 8 2.193z'/%3E%3C/svg%3E");
+}

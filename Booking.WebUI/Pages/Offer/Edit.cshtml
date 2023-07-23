@@ -1,0 +1,162 @@
+﻿@page
+@model Booking.WebUI.Pages.Offer.EditModel
+@{
+    ViewData["Title"] = "Edytuj ofertę";
+}
+
+<partial name="_MessagePartial" for="StatusMessage" />
+<form method="post" enctype="multipart/form-data">
+    <div class="row">
+        <div class="col-md-4">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label class="control-label">Tytuł</label>
+                <input asp-for="Offer.Title" class="form-control" />
+                <span asp-validation-for="Offer.Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label>Opis</label>
+                <textarea asp-for="Offer.Description" class="form-control"></textarea>
+                <span asp-validation-for="Offer.Description" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label>Adres</label>
+                <input asp-for="Offer.AddressLine" class="form-control" />
+                <span asp-validation-for="Offer.AddressLine" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label>Kod pocztowy</label>
+                <input asp-for="Offer.PostalCode" class="form-control" />
+                <span asp-validation-for="Offer.PostalCode" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-3">
+                <label>Miasto</label>
+                <select asp-for="Offer.CityID" asp-items="@Model.Cities">
+                    <option value="">Wybierz miasto</option>
+                </select>
+                <span asp-validation-for="Offer.CityID" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label>Zdjęcia:</label>
+                <input asp-for="Offer.Photos" type="file" class="form-control" multiple>
+                <span asp-validation-for="Offer.Photos" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label></label>
+                <input type="submit" class="btn btn-dark form-control" value="Stwórz" />
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <table id="lodgingOptions" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Maksymalna ilość osób</th>
+                    <th>Ilość łóżek</th>
+                    <th>Ilość pokoi</th>
+                    <th>Powierzchnia</th>
+                    <th>Cena za noc</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Offer?.LodgingOptions is not null)
+                {
+                    for (int i = 0; i < Model.Offer.LodgingOptions.Count; i++)
+                    {
+                        <tr>
+                            <td><input type="text" class="form-control" asp-for="Offer.LodgingOptions[i].PersonCount" placeholder="Ilość osób" required="required" /></td>
+                            <td><input type="text" class="form-control" asp-for="Offer.LodgingOptions[i].BedCount" placeholder="Ilość łóżek" required="required" /></td>
+                            <td><input type="text" class="form-control" asp-for="Offer.LodgingOptions[i].RoomCount" placeholder="Ilość pokoi" required="required" /></td>
+                            <td><input type="text" class="form-control" asp-for="Offer.LodgingOptions[i].Size" placeholder="Wielkość (m²)" required="required" /></td>
+                            <td><input type="text" class="form-control" asp-for="Offer.LodgingOptions[i].Price" placeholder="Cena za noc" required="required" /></td>
+                            <td><button type='button' class='btn btn-danger' onclick='deleteRow2(" + index + ")'> -</button></td>
+                        </tr>
+                    }
+                }
+                <tr>
+                    <td colspan="5"></td>
+                    <td>
+                        <input type="submit" id="addLodgingOption2" value="+" class="btn btn-dark" />
+                    </td>
+                </tr>
+        </table>
+    </div>
+</form>
+
+
+@section Scripts{
+<partial name="_ValidationPartial" />
+<script src="~/js/offer.js" asp-append-version="true"></script>
+<script>
+    //$("#addLodgingOption").on("click", addRow())
+    var count = 1;
+    $("#addLodgingOption").on("click", function () {
+        var htmlstring = "<div class='lodgingOptionRow'><label>Opcja noclegowa " + count + "</label>";
+        htmlstring += "<input type='text' class='form-control' name='Command.LodgingOptions[" + (count - 1) +"].Price' placeholder='Cena' required='required'>";
+        htmlstring += "<input type='text' class='form-control' name='Command.LodgingOptions[" + (count - 1) +"].PersonCount' placeholder='Liczba osób' required='required'>";
+        htmlstring += "<input type='text' class='form-control' name='Command.LodgingOptions[" + (count - 1) +"].Size' placeholder='Wielkość (m²)' required='required'>";
+        htmlstring += "<input type='text' class='form-control' name='Command.LodgingOptions[" + (count - 1) +"].RoomCount' placeholder='Liczba pokoi' required='required'>";
+        htmlstring += "<input type='text' class='form-control' name='Command.LodgingOptions[" + (count - 1) +"].BedCount' placeholder='Liczba łóżek' required='required'>";
+        //htmlstring += "<input type='checkbox' name='Command.LodgingOptions[" + (count - 1) +"].Smoking' value='true'>";
+        //htmlstring += "<div class='form-group'><label>Cena</label><input type='text' class='form-control' name='Command.LodgingOptions[" + (count - 1) +"].Price' required='required'></div>";
+        //htmlstring += "<div class='form-group'><label>Liczba osób</label><input type='text' class='form-control' name='Command.LodgingOptions[" + (count - 1) +"].PersonCount' required='required'></div>";
+        //htmlstring += "<div class='form-group'><label>Powierzchnia</label><input type='text' class='form-control' name='Command.LodgingOptions[" + (count - 1) +"].Size' required='required'></div>";
+        //htmlstring += "<div class='form-group'><label>Ilość pokoi</label><input type='text' class='form-control' name='Command.LodgingOptions[" + (count - 1) +"].RoomCount' required='required'></div>";
+        //htmlstring += "<div class='form-group'><label>Ilość łóżek</label><input type='text' class='form-control' name='Command.LodgingOptions[" + (count - 1) +"].BedCount' required='required'></div>";
+        //htmlstring += "<div class='form-group'><label>Dla palących</label><input type='checkbox' name='Command.LodgingOptions[" + (count - 1) +"].Smoking'></div>";
+        htmlstring += "<button class='btn btn-danger' style='padding-top:1px' onclick='deleteRow(this)' value='" + (count - 1)+"'>-</button></div>"
+        $(".lodgingOptions").append(htmlstring);
+        count++;
+    })
+
+
+    function deleteRow(element) {
+        var currentRow = parseInt($(element).val());
+        let nextsiblings = document.querySelectorAll('.lodgingOptionRow:nth-child(' + (currentRow + 1) + ') ~ *');
+        for (var i = 0; i < nextsiblings.length; i++) {
+            var childElements = nextsiblings[i].children;
+            childElements[0].textContent = "Opcja noclegowa" + (currentRow + 1);
+            childElements[1].setAttribute("name", "Command.LodgingOptions[" + currentRow + "].Price");
+            childElements[2].setAttribute("name", "Command.LodgingOptions[" + currentRow + "].PersonCount");
+            childElements[3].setAttribute("name", "Command.LodgingOptions[" + currentRow + "].Size");
+            childElements[4].setAttribute("name", "Command.LodgingOptions[" + currentRow + "].RoomCount");
+            childElements[5].setAttribute("name", "Command.LodgingOptions[" + currentRow + "].BedCount");
+            //childElements[6].setAttribute("name", "Command.LodgingOptions[" + currentRow + "].Smoking");
+            childElements[6].setAttribute("value", currentRow)
+            currentRow++;
+        }
+        $(element).parent("div").remove();
+        count--;
+    }
+
+    document.querySelector("#addLodgingOption2").onclick = () => addRow("lodgingOptions")
+    //      // Get a reference to the table
+    //    let tableRef = document.getElementById("lodgingOptions");
+    //    var row = table.insertRow(0);
+
+    //    // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
+    //    var cell1 = row.insertCell(0);
+    //    var cell2 = row.insertCell(1);
+    //    var cell3 = row.insertCell(1);
+    //    var cell4 = row.insertCell(1);
+    //    var cell5 = row.insertCell(1);
+    //    var cell6 = row.insertCell(1);
+
+    //    // Add some text to the new cells:
+    //    cell1.innerHTML = "NEW CELL1";
+    //    cell2.innerHTML = "NEW CELL2";
+    //    cell3.innerHTML = "NEW CELL1";
+    //    cell4.innerHTML = "NEW CELL2";
+    //    cell5.innerHTML = "NEW CELL1";
+    //    cell6.innerHTML = "NEW CELL2";
+    //    count2++;
+    //})
+
+
+</script>
+}
